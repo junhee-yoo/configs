@@ -1,233 +1,236 @@
-;;; init.el --- Prelude's configuration entry point.
-;;
-;; Copyright (c) 2011 Bozhidar Batsov
-;;
-;; Author: Bozhidar Batsov <bozhidar@batsov.com>
-;; URL: http://batsov.com/prelude
-;; Version: 1.0.0
-;; Keywords: convenience
+;; refer: https://github.com/shiren/dotfiles/blob/master/emacs.d/init.el
 
-;; This file is not part of GNU Emacs.
+;; 에러시 디버그모드
+;; (setq debug-on-error t)
 
-;;; Commentary:
+(when window-system
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (tooltip-mode -1))
 
-;; This file simply sets up the default load path and requires
-;; the various modules defined within Emacs Prelude.
+(setq inhibit-startup-message t)
+(setq initial-scratch-message "")
 
-;;; License:
+(setq ad-redefinition-action 'accept) ;; 함수 redefine으로 인한 경고 생략
 
-;; This program is free software; you can redistribute it and/or
-;; modify it under the terms of the GNU General Public License
-;; as published by the Free Software Foundation; either version 3
-;; of the License, or (at your option) any later version.
-;;
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-;;
-;; You should have received a copy of the GNU General Public License
-;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-;; Boston, MA 02110-1301, USA.
+(set-language-environment "Korean")
+(setq locale-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
 
-;;; Code:
-(defvar current-user
-      (getenv
-       (if (equal system-type 'windows-nt) "USERNAME" "USER")))
+(setq mac-command-key-is-meta t)
+(setq mac-command-modifier 'meta)
 
-(message "Prelude is powering up... Be patient, Master %s!" current-user)
+(setq echo-keystrokes 0.001) ;; 키입력시 에코창에 표시되는 딜레이 타임, 거이 없게 설정
 
-(when (version< emacs-version "24.1")
-  (error "Prelude requires at least GNU Emacs 24.1, but you're running %s" emacs-version))
+(setq tab-width 2)
 
-;; Always load newest byte code
-(setq load-prefer-newer t)
+;; 이맥스르 투명하게 하려면 숫자 조절
+(set-frame-parameter nil 'alpha 0.85)
 
-(defvar prelude-dir (file-name-directory load-file-name)
-  "The root dir of the Emacs Prelude distribution.")
-(defvar prelude-core-dir (expand-file-name "core" prelude-dir)
-  "The home of Prelude's core functionality.")
-(defvar prelude-modules-dir (expand-file-name  "modules" prelude-dir)
-  "This directory houses all of the built-in Prelude modules.")
-(defvar prelude-personal-dir (expand-file-name "personal" prelude-dir)
-  "This directory is for your personal configuration.
+(set-variable 'cursor-type 'bar)
 
-Users of Emacs Prelude are encouraged to keep their personal configuration
-changes in this directory.  All Emacs Lisp files there are loaded automatically
-by Prelude.")
-(defvar prelude-personal-preload-dir (expand-file-name "preload" prelude-personal-dir)
-  "This directory is for your personal configuration, that you want loaded before Prelude.")
-(defvar prelude-vendor-dir (expand-file-name "vendor" prelude-dir)
-  "This directory houses packages that are not yet available in ELPA (or MELPA).")
-(defvar prelude-savefile-dir (expand-file-name "savefile" prelude-dir)
-  "This folder stores all the automatically generated save/history-files.")
-(defvar prelude-modules-file (expand-file-name "prelude-modules.el" prelude-dir)
-  "This files contains a list of modules that will be loaded by Prelude.")
+;;; Paste setup
+(defun copy-from-osx ()
+  "Copy from osx."
+  (shell-command-to-string "pbpaste"))
 
-(unless (file-exists-p prelude-savefile-dir)
-  (make-directory prelude-savefile-dir))
+(defun paste-to-osx (text &optional push)
+  (let ((process-connection-type nil))
+    (let ((proc (start-process "pbcopy" "*Messages*" "pbcopy")))
+      (process-send-string proc text)
+      (process-send-eof proc))))
 
-(defun prelude-add-subfolders-to-load-path (parent-dir)
- "Add all level PARENT-DIR subdirs to the `load-path'."
- (dolist (f (directory-files parent-dir))
-   (let ((name (expand-file-name f parent-dir)))
-     (when (and (file-directory-p name)
-                (not (string-prefix-p "." f)))
-       (add-to-list 'load-path name)
-       (prelude-add-subfolders-to-load-path name)))))
+(unless window-system
+  (setq interprogram-cut-function 'paste-to-osx)
+  (setq interprogram-paste-function 'copy-from-osx))
 
-;; add Prelude's directories to Emacs's `load-path'
-(add-to-list 'load-path prelude-core-dir)
-(add-to-list 'load-path prelude-modules-dir)
-(add-to-list 'load-path prelude-vendor-dir)
-(prelude-add-subfolders-to-load-path prelude-vendor-dir)
+;;; Scroll setup
+(setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ;; one line at a time
+(setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
+(setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
 
-;; reduce the frequency of garbage collection by making it happen on
-;; each 50MB of allocated data (the default is on every 0.76MB)
-(setq gc-cons-threshold 50000000)
+(setq scroll-conservatively 200) ;; 스크롤 도중에 센터로 커서 이동하지 않도록
+(setq scroll-margin 3) ;; 스크롤시 남기는 여백
 
-;; warn when opening files bigger than 100MB
-(setq large-file-warning-threshold 100000000)
+;; 백업들 끄기
+(setq backup-inhibited t)
+(setq make-backup-files nil)
+(setq auto-save-default nil)
 
-;; preload the personal settings from `prelude-personal-preload-dir'
-(when (file-exists-p prelude-personal-preload-dir)
-  (message "Loading personal configuration files in %s..." prelude-personal-preload-dir)
-  (mapc 'load (directory-files prelude-personal-preload-dir 't "^[^#].*el$")))
+;; No popup frame(새버퍼열때 현재 프레임에서 열기)
+(setq ns-pop-up-frames nil)
+(setq pop-up-frames nil)
 
-(message "Loading Prelude's core...")
+;;; Set up package
+(require 'package)
+(add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/") t)
+; (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
+(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+;; (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(package-initialize)
 
-;; the core stuff
-(require 'prelude-packages)
-(require 'prelude-custom)  ;; Needs to be loaded before core, editor and ui
-(require 'prelude-ui)
-(require 'prelude-core)
-(require 'prelude-mode)
-(require 'prelude-editor)
-(require 'prelude-global-keybindings)
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
 
-;; OSX specific settings
-(when (eq system-type 'darwin)
-  (require 'prelude-osx))
+(eval-when-compile
+  (require 'use-package))
 
-(message "Loading Prelude's modules...")
+(use-package use-package-ensure-system-package
+  :ensure t)
 
-;; the modules
-(if (file-exists-p prelude-modules-file)
-    (load prelude-modules-file)
-  (message "Missing modules file %s" prelude-modules-file)
-  (message "You can get started by copying the bundled example file"))
+(use-package use-package-chords
+  :ensure t
+  :config (key-chord-mode 1))
 
-;; config changes made through the customize UI will be store here
-(setq custom-file (expand-file-name "custom.el" prelude-personal-dir))
+(use-package diminish
+  :ensure t)
 
-;; load the personal settings (this includes `custom-file')
-(when (file-exists-p prelude-personal-dir)
-  (message "Loading personal configuration files in %s..." prelude-personal-dir)
-  (mapc 'load (directory-files prelude-personal-dir 't "^[^#].*el$")))
-
-(message "Prelude is ready to do thy bidding, Master %s!" current-user)
-
-(prelude-eval-after-init
- ;; greet the use with some useful tip
- (run-at-time 5 nil 'prelude-tip-of-the-day))
-
-;;; init.el ends here
+(use-package whitespace-cleanup-mode
+	
+  :ensure t
+  :diminish whitespace-cleanup-mode
+  :delight '(:eval "")
+  :init
+  (setq whitespace-cleanup-mode-only-if-initially-clean nil)
+  (add-hook 'prog-mode-hook 'whitespace-cleanup-mode)
+  (add-hook 'lsp-mode-hook 'whitespace-cleanup-mode))
+  ;;(add-hook 'org-mode-hook 'whitespace-cleanup-mode))
 
 
+;;;; Emacs extend
+(use-package which-key
+  :ensure t
+  :diminish which-key-mode
+  :init
+  (setq which-key-idle-delay 2)
+  (setq which-key-max-description-length 40)
+  (setq which-key-max-display-columns nil)
+  (which-key-setup-side-window-bottom)
+  (which-key-mode))
 
-;; (defun copy-line (arg)
-;;   "Copy lines (as many as prefix argument) in the kill ring.
-;;       Ease of use features:
-;;       - Move to start of next line.
-;;       - Appends the copy on sequential calls.
-;;       - Use newline as last char even on the last line of the buffer.
-;;       - If region is active, copy its lines."
-;;   (interactive "p")
-;;   (let ((beg (line-beginning-position))
-;;         (end (line-end-position arg)))
-;;     (when mark-active
-;;       (if (> (point) (mark))
-;;           (setq beg (save-excursion (goto-char (mark)) (line-beginning-position)))
-;;         (setq end (save-excursion (goto-char (mark)) (line-end-position)))))
-;;     (if (eq last-command 'copy-line)
-;;         (kill-append (buffer-substring beg end) (< end beg))
-;;       (kill-ring-save beg end)))
-;;   (kill-append "\n" nil)
-;;   (beginning-of-line (or (and arg (1+ arg)) 2))
-;;   (if (and arg (not (= 1 arg))) (message "%d lines copied" arg)))
+(use-package dashboard
+  :ensure t
+  :config
+  (dashboard-setup-startup-hook)
+  (setq dashboard-items '((recents  . 20)
+                          (bookmarks . 10)
+                          (projects . 10))))
 
-;; (global-set-key "\C-c\C-k" 'copy-line)
+(use-package helpful
+  :ensure t
+  :bind
+  ("C-h f" . helpful-function)
+  ("C-h F" . helpful-command)
+  ("C-h v" . helpful-variable))
 
-(require 'google-c-style)
-(add-hook 'c-mode-common-hook 'google-set-c-style)
-(add-hook 'c-mode-common-hook 'google-make-newline-indent)
+(use-package exec-path-from-shell
+  :ensure t
+  :init
+  (when (memq window-system '(mac ns))
+    (exec-path-from-shell-initialize)))
 
-(require 'xcscope)
 
-(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
-(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB works in terminal
-(define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+;;;; Themes
+(use-package zenburn-theme
+  :disabled
+  :ensure t
+  :init
+  (load-theme 'zenburn t))
 
-(global-set-key (kbd "C-]") 'cscope-find-this-symbol)
-(global-set-key (kbd "C-}") 'cscope-find-functions-calling-this-function)
-;(global-set-key (kbd "C-<") 'cscope-history-backward-line)
-;(global-set-key (kbd "C->") 'cscope-history-forward-line)
+(use-package spacemacs-theme
+  :ensure t
+  :defer t
+  :init
+  (load-theme 'spacemacs-dark t)
+  :config
+  (setq spacemacs-theme-org-agenda-height nil)
+  (setq spacemacs-theme-org-height nil))
 
-(global-set-key (kbd "M-]") 'switch-to-next-buffer)
-(global-set-key (kbd "M-[") 'switch-to-prev-buffer)
-(global-set-key [delete] 'sp-delete-char)
+(use-package spaceline-config
+  :ensure spaceline
+  :init
+  (setq powerline-default-separator 'arrow-fade)
+  :config
+  (spaceline-emacs-theme)
+  (spaceline-toggle-buffer-id-on)
+  (spaceline-toggle-input-method-on)
+  (spaceline-toggle-buffer-modified-on)
+  (spaceline-toggle-buffer-encoding-on)
+  (spaceline-toggle-buffer-encoding-abbrev-off)
+  (spaceline-toggle-process-on)
+  (spaceline-toggle-projectile-root-on)
+  (spaceline-toggle-version-control-on)
+  (spaceline-toggle-flycheck-error-on)
+  (spaceline-toggle-flycheck-info-on)
+  (spaceline-toggle-flycheck-warning-on)
+  (spaceline-toggle-battery-on)
+  (spaceline-toggle-major-mode-off)
+  (spaceline-toggle-minor-modes-on)
+  (spaceline-toggle-line-column-on)
+  (spaceline-toggle-org-clock-on)
+  (spaceline-toggle-window-number-on)
+  (spaceline-info-mode))
 
-(global-set-key (kbd "C-S-f") 'windmove-right)
-(global-set-key (kbd "C-S-b") 'windmove-left)
-(global-set-key (kbd "C-S-p") 'windmove-up)
-(global-set-key (kbd "C-S-n") 'windmove-down)
+;;;; Highlighting
+(use-package paren
+  :init
+  (show-paren-mode 1)
+  (setq show-paren-delay 0))
 
-(global-set-key (kbd "C-<tab>") 'other-frame)
+(use-package hl-line
+  :init
+  (global-hl-line-mode +1))
 
-(set-frame-parameter (selected-frame) 'alpha '(81 81))
-(add-to-list 'default-frame-alist '(alpha 85 85))
-;(set-face-attribute 'default nil :background "black"
-;                    :foreground "white" :font "Courier" :height 180)
+(use-package highlight-thing
+  :ensure t
+  :diminish highlight-thing-mode
+  :init
+  (setq highlight-thing-case-sensitive-p t)
+  (setq highlight-thing-limit-to-defun t)
+  (add-hook 'prog-mode-hook 'highlight-thing-mode))
 
-(require 'confluence)
-(setq confluence-url "http://suprem.sec.samsung.net/confluence/rpc/xmlrpc")
+(use-package rainbow-mode
+  :ensure t)
 
-(require 'font-lock)
+(use-package rainbow-delimiters
+  :ensure t
+  :init
+  (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode))
 
-(defun --copy-face (new-face face)
-  "Define NEW-FACE from existing FACE."
-  (copy-face face new-face)
-  (eval `(defvar ,new-face nil))
-  (set new-face new-face))
+(use-package highlight-indent-guides
+  :ensure t
+  :disabled
+  :init
+  :config
+  (add-hook 'vue-html-mode-hook 'highlight-indent-guides-mode)
+  (add-hook 'vue-mode-hook 'highlight-indent-guides-mode)
+  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
 
-(--copy-face 'font-lock-label-face  ; labels, case, public, private, proteced, namespace-tags
-         'font-lock-keyword-face)
-(--copy-face 'font-lock-doc-markup-face ; comment markups such as Javadoc-tags
-         'font-lock-doc-face)
-(--copy-face 'font-lock-doc-string-face ; comment markups
-         'font-lock-comment-face)
+(use-package git-gutter
+  :ensure t
+  :diminish git-gutter-mode
+  :init
+  (global-git-gutter-mode +1))
 
-(global-font-lock-mode t)
-(setq font-lock-maximum-decoration t)
 
-; c++14 syntax coloring
-(add-hook 'c++-mode-hook
-      '(lambda()
-        (font-lock-add-keywords
-         nil '(;; complete some fundamental keywords
-           ("\\<\\(void\\|unsigned\\|signed\\|char\\|short\\|bool\\|int\\|long\\|float\\|double\\)\\>" . font-lock-keyword-face)
-           ;; add the new C++11 keywords
-           ("\\<\\(alignof\\|alignas\\|constexpr\\|decltype\\|noexcept\\|nullptr\\|static_assert\\|thread_local\\|override\\|final\\)\\>" . font-lock-keyword-face)
-           ("\\<\\(char[0-9]+_t\\)\\>" . font-lock-keyword-face)
-           ;; PREPROCESSOR_CONSTANT
-           ("\\<[A-Z]+[A-Z_]+\\>" . font-lock-constant-face)
-           ;; hexadecimal numbers
-           ("\\<0[xX][0-9A-Fa-f]+\\>" . font-lock-constant-face)
-           ;; integer/float/scientific numbers
-           ("\\<[\\-+]*[0-9]*\\.?[0-9]+\\([ulUL]+\\|[eE][\\-+]?[0-9]+\\)?\\>" . font-lock-constant-face)
-           ;; user-types (customize!)
-           ("\\<[A-Za-z_]+[A-Za-z_0-9]*_\\(t\\|type\\|ptr\\)\\>" . font-lock-type-face)
-           ("\\<\\(xstring\\|xchar\\)\\>" . font-lock-type-face)
-           ))
-        ) t)
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+	 (quote
+		(projectile exec-path-from-shell helpful git-gutter rainbow-delimiters rainbow-mode highlight-thing spaceline spacemacs-theme dashboard which-key whitespace-cleanup-mode diminish use-package-chords use-package-ensure-system-package lsp-mode))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
