@@ -297,18 +297,18 @@
 	:ensure t
 	:diminish helm-mode
 	:bind (("C-c h" . helm-mini)
-	       ("C-h a" . helm-apropos)
-	       ;; ("C-x C-b" . helm-buffers-list)
-	       ;; ("C-x b" . helm-buffers-list)
-	       ("M-y" . helm-show-kill-ring)
-	       ("M-x" . helm-M-x)
-	       ("C-x c o" . helm-occur)
-	       ("C-x c s" . helm-swoop)
-	       ("C-x c y" . helm-yas-complete)
-	       ("C-x c Y" . helm-yas-create-snippet-on-region)
-	       ("C-x c b" . my/helm-do-grep-book-notes)
-	       ("C-x c SPC" . helm-all-mark-rings)
-	       ("C-x C-o" . ffap))
+				 ("C-h a" . helm-apropos)
+				 ;; ("C-x C-b" . helm-buffers-list)
+				 ;; ("C-x b" . helm-buffers-list)
+				 ("M-y" . helm-show-kill-ring)
+				 ("M-x" . helm-M-x)
+				 ("C-x c o" . helm-occur)
+				 ("C-x c s" . helm-swoop)
+				 ("C-x c y" . helm-yas-complete)
+				 ("C-x c Y" . helm-yas-create-snippet-on-region)
+				 ("C-x c b" . my/helm-do-grep-book-notes)
+				 ("C-x c SPC" . helm-all-mark-rings)
+				 ("C-x C-o" . ffap))
 	:init
 	(require 'helm-config)
 	(setq helm-candidate-number-limit 100)
@@ -334,12 +334,41 @@
 ; start pinentry server in emacs
 (pinentry-start)
 
+;; magit
+; configure forge to integrate magit with github
+(use-package forge
+	;	init:
+	; (setq magithub-github-hosts '("github.com" "git.linecorp.com" "oss.navercorp.com"))
+	:config
+	(add-to-list 'forge-alist '("git.linecorp.com" "git.linecorp.com/api"
+															"git.linecorp.com" forge-gitlab-repository))
+	(add-to-list 'forge-alist '("oss.navercorp.com" "oss.navercorp.com/api"
+															"oss.navercorp.com" forge-gitlab-repository))
+	:after magit)
+;; END_OF_MAGIT
+
+
+;; LSP_MODE
+(use-package lsp-mode
+  :hook (XXX-mode . lsp-deferred)
+  :commands (lsp lsp-deferred))
+
+; optionally
+(use-package lsp-ui :commands lsp-ui-mode)
+(use-package company-lsp :commands company-lsp)
+(use-package helm-lsp :commands helm-lsp-workspace-symbol)
+(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+; optionally if you want to use debugger
+(use-package dap-mode)
+; (use-package dap-LANGUAGE) to load the dap adapter for your language
 
 ;; (with-eval-after-load 'lsp-mode
 ;;      (require 'lsp-clangd)
 ;;      (add-hook 'c-mode-hook #'lsp-clangd-c-enable)
 ;;      (add-hook 'c++-mode-hook #'lsp-clangd-c++-enable)
 ;;      (add-hook 'objc-mode-hook #'lsp-clangd-objc-enable))
+;; END_OF_LSP_MODE
+
 
 
 (custom-set-variables
@@ -348,9 +377,10 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(eyebrowse-mode t)
+ '(org-agenda-files (quote ("~/workspace/projects/finup/2019-09-23.org")))
  '(package-selected-packages
 	 (quote
-		(helm-descbinds helm multi-term org-bullets lsp-clangd magit treemacs treemacs-magit bazel-mode swiper zoom writeroom-mode ace-window eyebrowse projectile exec-path-from-shell helpful git-gutter rainbow-delimiters rainbow-mode highlight-thing spaceline spacemacs-theme dashboard which-key whitespace-cleanup-mode diminish use-package-chords use-package-ensure-system-package))))
+		(dap-mode forge helm-descbinds helm multi-term org-bullets lsp-clangd magit treemacs treemacs-magit bazel-mode swiper zoom writeroom-mode ace-window eyebrowse projectile exec-path-from-shell helpful git-gutter rainbow-delimiters rainbow-mode highlight-thing spaceline spacemacs-theme dashboard which-key whitespace-cleanup-mode diminish use-package-chords use-package-ensure-system-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
