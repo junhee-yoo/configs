@@ -349,24 +349,86 @@
 
 
 ;; LSP_MODE
+(use-package hydra)
+
+(use-package helm-lsp
+	:config
+	(defun netrom/helm-lsp-workspace-symbol-at-point ()
+		(interactive)
+		(let ((current-prefix-arg t))
+			(call-interactively #'helm-lsp-workspace-symbol)))
+
+	(defun netrom/helm-lsp-global-workspace-symbol-at-point ()
+		(interactive)
+		(let ((current-prefix-arg t))
+			(call-interactively #'helm-lsp-global-workspace-symbol))))
+
 (use-package lsp-mode
-  :hook (XXX-mode . lsp-deferred)
-  :commands (lsp lsp-deferred))
+	:requires hydra helm helm-lsp
+	:hook
+	(c-mode . lsp-deferred)  ;; PATH should contains clangd command path.
+	(c++-mode . lsp-deferred)  ;; PATH should contains clangd command path.
+	(python-mode . lsp-deferred)  ;; PATH should contains pyls command path.
+	(rust-mode . lsp-deferred)  ;; PATH should contains rls command path.
+	(go-mode . lsp-deferred)  ;; PATH should contains gopls command path.
+	(lsp-mode . (lambda () (local-set-key (kbd "C-c C-l") 'netrom/lsp-hydra/body)))
+	:commands (lsp lsp-deferred)
+	:config
+	(setq lsp-clients-clangd-args '("-j=4" "-background-index" "-log=error"))
+	(setq netrom--general-lsp-hydra-heads
+				'(;; Xref
+					("d" xref-find-definitions "Definitions" :column "Xref")
+					("D" xref-find-definitions-other-window "-> other win")
+					("r" xref-find-references "References")
+					("s" netrom/helm-lsp-workspace-symbol-at-point "Helm search")
+					("S" netrom/helm-lsp-global-workspace-symbol-at-point "Helm global search")
+
+					;; Peek
+					("C-d" lsp-ui-peek-find-definitions "Definitions" :column "Peek")
+					("C-r" lsp-ui-peek-find-references "References")
+					("C-i" lsp-ui-peek-find-implementation "Implementation")
+
+					;; LSP
+					("p" lsp-describe-thing-at-point "Describe at point" :column "LSP")
+					("C-a" lsp-execute-code-action "Execute code action")
+					("R" lsp-rename "Rename")
+					("t" lsp-goto-type-definition "Type definition")
+					("i" lsp-goto-implementation "Implementation")
+					("f" helm-imenu "Filter funcs/classes (Helm)")
+					("C-c" lsp-describe-session "Describe session")
+
+					;; Flycheck
+					("l" lsp-ui-flycheck-list "List errs/warns/notes" :column "Flycheck"))
+
+				netrom--misc-lsp-hydra-heads
+				'(;; Misc
+					("q" nil "Cancel" :column "Misc")
+					("b" pop-tag-mark "Back")))
+	(eval `(defhydra netrom/lsp-hydra (:color blue :hint nil)
+					 ,@(append
+							netrom--general-lsp-hydra-heads
+							netrom--misc-lsp-hydra-heads)))
+	:ensure t)
 
 ; optionally
-(use-package lsp-ui :commands lsp-ui-mode)
-(use-package company-lsp :commands company-lsp)
-(use-package helm-lsp :commands helm-lsp-workspace-symbol)
+(use-package lsp-ui :commands lsp-ui-mode :ensure t)
+
+(use-package company-lsp
+	:requires company
+	:commands company-lsp
+	:config
+	(push 'company-lsp company-backends)
+	; disable client-side cache because gthe SLP server does a better job.
+	(setq company-transformers nil
+	company-lsp-async t
+	company-lsp-cache-candidates nil)
+	:ensure t)
+
 (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 ; optionally if you want to use debugger
 (use-package dap-mode)
 ; (use-package dap-LANGUAGE) to load the dap adapter for your language
 
-;; (with-eval-after-load 'lsp-mode
-;;      (require 'lsp-clangd)
-;;      (add-hook 'c-mode-hook #'lsp-clangd-c-enable)
-;;      (add-hook 'c++-mode-hook #'lsp-clangd-c++-enable)
-;;      (add-hook 'objc-mode-hook #'lsp-clangd-objc-enable))
 ;; END_OF_LSP_MODE
 
 
@@ -377,10 +439,11 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(eyebrowse-mode t)
+ '(global-company-mode t)
  '(org-agenda-files (quote ("~/workspace/projects/finup/2019-09-23.org")))
  '(package-selected-packages
 	 (quote
-		(dap-mode forge helm-descbinds helm multi-term org-bullets lsp-clangd magit treemacs treemacs-magit bazel-mode swiper zoom writeroom-mode ace-window eyebrowse projectile exec-path-from-shell helpful git-gutter rainbow-delimiters rainbow-mode highlight-thing spaceline spacemacs-theme dashboard which-key whitespace-cleanup-mode diminish use-package-chords use-package-ensure-system-package))))
+		(go-mode lsp-ui helm-lsp lsp-treemacs flycheck dap-mode forge helm-descbinds helm multi-term org-bullets lsp-clangd magit treemacs treemacs-magit bazel-mode swiper zoom writeroom-mode ace-window eyebrowse projectile exec-path-from-shell helpful git-gutter rainbow-delimiters rainbow-mode highlight-thing spaceline spacemacs-theme dashboard which-key whitespace-cleanup-mode diminish use-package-chords use-package-ensure-system-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
