@@ -364,16 +364,17 @@
 			(call-interactively #'helm-lsp-global-workspace-symbol))))
 
 (use-package lsp-mode
-	:requires hydra helm helm-lsp
+	:requires hydra helm helm-lsp lsp-java yasnippet
 	:hook
 	(c-mode . lsp-deferred)  ;; PATH should contains clangd command path.
 	(c++-mode . lsp-deferred)  ;; PATH should contains clangd command path.
 	(python-mode . lsp-deferred)  ;; PATH should contains pyls command path.
 	(rust-mode . lsp-deferred)  ;; PATH should contains rls command path.
 	(go-mode . lsp-deferred)  ;; PATH should contains gopls command path.
-	(lsp-mode . (lambda () (local-set-key (kbd "C-c C-l") 'netrom/lsp-hydra/body)))
+	(java-mode . lsp-deferred)  ;;
 	:commands (lsp lsp-deferred)
 	:config
+	(setq lsp-prefer-flymake nil) ;; Prefer using lsp-ui(flycheck) over flymake
 	(setq lsp-clients-clangd-args '("-j=4" "-background-index" "-log=error"))
 	(setq netrom--general-lsp-hydra-heads
 				'(;; Xref
@@ -408,10 +409,18 @@
 					 ,@(append
 							netrom--general-lsp-hydra-heads
 							netrom--misc-lsp-hydra-heads)))
+	(add-hook 'lsp-mode-hook  ;; To override all other key config
+						(lambda () (local-set-key (kbd "C-c C-j") 'netrom/lsp-hydra/body)))
 	:ensure t)
 
+
 ; optionally
-(use-package lsp-ui :commands lsp-ui-mode :ensure t)
+(use-package lsp-ui
+	:requires lsp-mode flycheck
+	:hook
+	(lsp-mode . lsp-ui-mode)
+	:commands lsp-ui-mode
+	:ensure t)
 
 (use-package company-lsp
 	:requires company
@@ -443,7 +452,7 @@
  '(org-agenda-files (quote ("~/workspace/projects/finup/2019-09-23.org")))
  '(package-selected-packages
 	 (quote
-		(go-mode lsp-ui helm-lsp lsp-treemacs flycheck dap-mode forge helm-descbinds helm multi-term org-bullets lsp-clangd magit treemacs treemacs-magit bazel-mode swiper zoom writeroom-mode ace-window eyebrowse projectile exec-path-from-shell helpful git-gutter rainbow-delimiters rainbow-mode highlight-thing spaceline spacemacs-theme dashboard which-key whitespace-cleanup-mode diminish use-package-chords use-package-ensure-system-package))))
+		(yasnippet lsp-java ein jupyter go-mode lsp-ui helm-lsp lsp-treemacs flycheck dap-mode forge helm-descbinds helm multi-term org-bullets lsp-clangd magit treemacs treemacs-magit bazel-mode swiper zoom writeroom-mode ace-window eyebrowse projectile exec-path-from-shell helpful git-gutter rainbow-delimiters rainbow-mode highlight-thing spaceline spacemacs-theme dashboard which-key whitespace-cleanup-mode diminish use-package-chords use-package-ensure-system-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
