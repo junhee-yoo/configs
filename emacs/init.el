@@ -12,7 +12,9 @@
 ;; server mode 시작
 (server-start)
 
-;; put below configuration into .zshrc or .bashrc to prevent execute vi,vim,emacs in terminal-mode
+;; put below configuration into .zshrc/.zshenv or .bashrc to prevent execute
+;; vi,vim,emacs in terminal-mode
+;;
 ;; if [[ ${INSIDE_EMACS} ]]; then
 ;;     alias vi="emacsclient"
 ;;     alias vim="emacsclient"
@@ -443,7 +445,21 @@
 	company-lsp-cache-candidates nil)
 	:ensure t)
 
-(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+(use-package treemacs
+	:ensure t
+	:defer t
+	:bind
+	("M-0" . treemacs-select-window)
+	)
+
+(use-package treemacs-magit
+	:after treemacs magit
+	:ensure t)
+
+(use-package lsp-treemacs
+	:commands
+	lsp-treemacs-errors-list
+	)
 ; optionally if you want to use debugger
 (use-package dap-mode)
 ; (use-package dap-LANGUAGE) to load the dap adapter for your language
@@ -459,10 +475,12 @@
  ;; If there is more than one, they won't work right.
  '(eyebrowse-mode t)
  '(global-company-mode t)
+ '(global-display-line-numbers-mode t)
+ '(global-visual-fill-column-mode t)
  '(org-agenda-files (quote ("~/workspace/projects/finup/2019-09-23.org")))
  '(package-selected-packages
-   (quote
-    (markdown-preview-mode gh-md flymd yasnippet lsp-java ein jupyter go-mode lsp-ui helm-lsp lsp-treemacs flycheck dap-mode forge helm-descbinds helm multi-term org-bullets lsp-clangd magit treemacs treemacs-magit bazel-mode swiper zoom writeroom-mode ace-window eyebrowse projectile exec-path-from-shell helpful git-gutter rainbow-delimiters rainbow-mode highlight-thing spaceline spacemacs-theme dashboard which-key whitespace-cleanup-mode diminish use-package-chords use-package-ensure-system-package))))
+	 (quote
+		(treemacs-icons-dired treemacs-projectile markdown-preview-mode gh-md flymd yasnippet lsp-java ein jupyter go-mode lsp-ui helm-lsp lsp-treemacs flycheck dap-mode forge helm-descbinds helm multi-term org-bullets lsp-clangd magit treemacs treemacs-magit bazel-mode swiper zoom writeroom-mode ace-window eyebrowse projectile exec-path-from-shell helpful git-gutter rainbow-delimiters rainbow-mode highlight-thing spaceline spacemacs-theme dashboard which-key whitespace-cleanup-mode diminish use-package-chords use-package-ensure-system-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
