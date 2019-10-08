@@ -9,8 +9,15 @@
 	(scroll-bar-mode -1)
 	(tooltip-mode -1))
 
-;; server mode 시작n
+;; server mode 시작
 (server-start)
+
+;; put below configuration into .zshrc or .bashrc to prevent execute vi,vim,emacs in terminal-mode
+;; if [[ ${INSIDE_EMACS} ]]; then
+;;     alias vi="emacsclient"
+;;     alias vim="emacsclient"
+;;     alias emacs="emacsclient"
+;; fi
 
 (setq inhibit-startup-message t)
 (setq initial-scratch-message "")
