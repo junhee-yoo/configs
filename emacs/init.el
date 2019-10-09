@@ -475,8 +475,6 @@
  ;; If there is more than one, they won't work right.
  '(eyebrowse-mode t)
  '(global-company-mode t)
- '(global-display-line-numbers-mode t)
- '(global-visual-fill-column-mode t)
  '(org-agenda-files (quote ("~/workspace/projects/finup/2019-09-23.org")))
  '(package-selected-packages
 	 (quote
