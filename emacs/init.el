@@ -302,7 +302,18 @@
 (add-hook 'term-mode-hook
 		(lambda ()
 	(define-key term-raw-map (kbd "C-j")
-	(lookup-key (current-global-map) (kbd "C-j")))))
+		(lookup-key (current-global-map) (kbd "C-j")))))
+
+
+;; Language specific configs
+(use-package python-mode
+	:ensure t
+	:config
+	(setq indent-tabs-mode t)
+	(setq tab-width 4)
+	(setq python-indent-offset 4)
+	)
+
 
 ;; Helm config
 (use-package helm
@@ -361,19 +372,11 @@
 
 
 ;; LSP_MODE
+
+; for lsp-yasnippet
+(use-package yasnippet)
+
 (use-package hydra)
-
-(use-package helm-lsp
-	:config
-	(defun netrom/helm-lsp-workspace-symbol-at-point ()
-		(interactive)
-		(let ((current-prefix-arg t))
-			(call-interactively #'helm-lsp-workspace-symbol)))
-
-	(defun netrom/helm-lsp-global-workspace-symbol-at-point ()
-		(interactive)
-		(let ((current-prefix-arg t))
-			(call-interactively #'helm-lsp-global-workspace-symbol))))
 
 (use-package lsp-mode
 	:requires hydra helm helm-lsp lsp-java yasnippet
@@ -425,6 +428,17 @@
 						(lambda () (local-set-key (kbd "C-c C-j") 'netrom/lsp-hydra/body)))
 	:ensure t)
 
+(use-package helm-lsp
+	:config
+	(defun netrom/helm-lsp-workspace-symbol-at-point ()
+		(interactive)
+		(let ((current-prefix-arg t))
+			(call-interactively #'helm-lsp-workspace-symbol)))
+
+	(defun netrom/helm-lsp-global-workspace-symbol-at-point ()
+		(interactive)
+		(let ((current-prefix-arg t))
+			(call-interactively #'helm-lsp-global-workspace-symbol))))
 
 ; optionally
 (use-package lsp-ui
@@ -467,7 +481,6 @@
 ;; END_OF_LSP_MODE
 
 
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -478,7 +491,7 @@
  '(org-agenda-files (quote ("~/workspace/projects/finup/2019-09-23.org")))
  '(package-selected-packages
 	 (quote
-		(treemacs-icons-dired treemacs-projectile markdown-preview-mode gh-md flymd yasnippet lsp-java ein jupyter go-mode lsp-ui helm-lsp lsp-treemacs flycheck dap-mode forge helm-descbinds helm multi-term org-bullets lsp-clangd magit treemacs treemacs-magit bazel-mode swiper zoom writeroom-mode ace-window eyebrowse projectile exec-path-from-shell helpful git-gutter rainbow-delimiters rainbow-mode highlight-thing spaceline spacemacs-theme dashboard which-key whitespace-cleanup-mode diminish use-package-chords use-package-ensure-system-package))))
+		(ag cmake-font-lock cmake-mode cmake-project cmake-ide pdf-view-restore pdf-tools treemacs-icons-dired treemacs-projectile markdown-preview-mode gh-md flymd yasnippet lsp-java ein jupyter go-mode lsp-ui helm-lsp lsp-treemacs flycheck dap-mode forge helm-descbinds helm multi-term org-bullets lsp-clangd magit treemacs treemacs-magit bazel-mode swiper zoom writeroom-mode ace-window eyebrowse projectile exec-path-from-shell helpful git-gutter rainbow-delimiters rainbow-mode highlight-thing spaceline spacemacs-theme dashboard which-key whitespace-cleanup-mode diminish use-package-chords use-package-ensure-system-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
