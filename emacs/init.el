@@ -12,6 +12,25 @@
 ;; server mode 시작
 (server-start)
 
+; Apple script for eamcs daemon
+;; tell application "Terminal"
+;; do shell script "/Applications/Emacs.app/Contents/MacOS/Emacs --daemon"
+;; end tell
+
+; Apple script for emacs client
+;; tell application "Terminal"
+;; try
+;; set frameVisible to do shell script "/Applications/Emacs.app/Contents/MacOS/bin/emacsclient -e '(<= 2 (length (visible-frame-list)))'"
+;; if frameVisible is not "t" then
+;; do shell script "/Applications/Emacs.app/Contents/MacOS/bin/emacsclient -c -n"
+;; end if
+;; on error
+;; do shell script "/Applications/Emacs.app/Contents/MacOS/Emacs --daemon"
+;; do shell script "/Applications/Emacs.app/Contents/MacOS/bin/emacsclient -c -n"
+;; end try
+;; end tell
+;; tell application "Emacs" to activate
+
 ;; put below configuration into .zshrc/.zshenv or .bashrc to prevent execute
 ;; vi,vim,emacs in terminal-mode
 ;;
@@ -41,7 +60,8 @@
 (setq tab-width 2)
 
 ;; 이맥스르 투명하게 하려면 숫자 조절
-(set-frame-parameter nil 'alpha 0.85)
+(set-frame-parameter nil 'alpha 0.95
+					 )
 
 (set-variable 'cursor-type 'bar)
 
@@ -300,8 +320,8 @@
 
 ;; terminal(멀티텀포함)에서 C-j를 글로벌 맵이용하도록 훅
 (add-hook 'term-mode-hook
-		(lambda ()
-	(define-key term-raw-map (kbd "C-j")
+	  (lambda ()
+		(define-key term-raw-map (kbd "C-j")
 		(lookup-key (current-global-map) (kbd "C-j")))))
 
 
@@ -313,6 +333,26 @@
 	(setq tab-width 4)
 	(setq python-indent-offset 4)
 	)
+
+; python flycheck from venv
+;; (defun set-flychecker-executables ()
+;;   "Configure virtualenv for flake8 and lint."
+;;   (when (get-current-buffer-flake8)
+;;     (flycheck-set-checker-executable (quote python-flake8)
+;;					 (get-current-buffer-flake8)))
+;;   (when (get-current-buffer-pylint)
+;;     (flycheck-set-checker-executable (quote python-pylint)
+;;					 (get-current-buffer-pylint))))
+;; (add-hook 'flycheck-before-syntax-check-hook
+;;	  #'set-flychecker-executables 'local)
+; end of python flycheck from venv
+
+
+(use-package protobuf-mode)
+
+(add-to-list 'auto-mode-alist '("\\.proto\\'" . python-mode))
+
+;; End of Language specific configs
 
 
 ;; Helm config
@@ -373,60 +413,18 @@
 
 ;; LSP_MODE
 
+; language config
+(use-package lsp-java
+  :ensure t)
+
+
 ; for lsp-yasnippet
-(use-package yasnippet)
+(use-package yasnippet
+  :ensure t)
+
 
 (use-package hydra)
 
-(use-package lsp-mode
-	:requires hydra helm helm-lsp lsp-java yasnippet
-	:hook
-	(c-mode . lsp-deferred)  ;; PATH should contains clangd command path.
-	(c++-mode . lsp-deferred)  ;; PATH should contains clangd command path.
-	(python-mode . lsp-deferred)  ;; PATH should contains pyls command path.
-	(rust-mode . lsp-deferred)  ;; PATH should contains rls command path.
-	(go-mode . lsp-deferred)  ;; PATH should contains gopls command path.
-	(java-mode . lsp-deferred)  ;;
-	:commands (lsp lsp-deferred)
-	:config
-	(setq lsp-prefer-flymake nil) ;; Prefer using lsp-ui(flycheck) over flymake
-	(setq lsp-clients-clangd-args '("-j=4" "-background-index" "-log=error"))
-	(setq netrom--general-lsp-hydra-heads
-				'(;; Xref
-					("d" xref-find-definitions "Definitions" :column "Xref")
-					("D" xref-find-definitions-other-window "-> other win")
-					("r" xref-find-references "References")
-					("s" netrom/helm-lsp-workspace-symbol-at-point "Helm search")
-					("S" netrom/helm-lsp-global-workspace-symbol-at-point "Helm global search")
-
-					;; Peek
-					("C-d" lsp-ui-peek-find-definitions "Definitions" :column "Peek")
-					("C-r" lsp-ui-peek-find-references "References")
-					("C-i" lsp-ui-peek-find-implementation "Implementation")
-
-					;; LSP
-					("p" lsp-describe-thing-at-point "Describe at point" :column "LSP")
-					("C-a" lsp-execute-code-action "Execute code action")
-					("R" lsp-rename "Rename")
-					("t" lsp-goto-type-definition "Type definition")
-					("i" lsp-goto-implementation "Implementation")
-					("f" helm-imenu "Filter funcs/classes (Helm)")
-					("C-c" lsp-describe-session "Describe session")
-
-					;; Flycheck
-					("l" lsp-ui-flycheck-list "List errs/warns/notes" :column "Flycheck"))
-
-				netrom--misc-lsp-hydra-heads
-				'(;; Misc
-					("q" nil "Cancel" :column "Misc")
-					("b" pop-tag-mark "Back")))
-	(eval `(defhydra netrom/lsp-hydra (:color blue :hint nil)
-					 ,@(append
-							netrom--general-lsp-hydra-heads
-							netrom--misc-lsp-hydra-heads)))
-	(add-hook 'lsp-mode-hook  ;; To override all other key config
-						(lambda () (local-set-key (kbd "C-c C-j") 'netrom/lsp-hydra/body)))
-	:ensure t)
 
 (use-package helm-lsp
 	:config
@@ -440,13 +438,71 @@
 		(let ((current-prefix-arg t))
 			(call-interactively #'helm-lsp-global-workspace-symbol))))
 
+
+(use-package lsp-mode
+  :ensure t
+  :requires hydra helm helm-lsp lsp-java yasnippet
+  :hook
+  (c-mode . lsp-clangd-c-enable)
+  (c++-mode-hook . lsp-clangd-c++-enable)
+  (objc-mode-hook . lsp-clangd-objc-enable)
+  ;((c-mode c++-mode objc-mode) . lsp-deferred)  ;; PATH should contains clangd command path.
+  (python-mode . lsp-deferred)  ;; PATH should contains pyls command path.
+  (rust-mode . lsp-deferred)  ;; PATH should contains rls command path.
+  (go-mode . lsp-deferred)  ;; PATH should contains gopls command path.
+  (java-mode . lsp-deferred)  ;;
+  :commands (lsp lsp-deferred)
+  :config
+  (setq lsp-clients-clangd-args '("-j=4" "-background-index" "-log=error"))
+  (setq lsp-prefer-flymake nil) ;; Prefer using lsp-ui(flycheck) over flymake
+  (setq lsp-clients-clangd-args '("-j=4" "-background-index" "-log=error"))
+  (setq netrom--general-lsp-hydra-heads
+		'(;; Xref
+		  ("d" xref-find-definitions "Definitions" :column "Xref")
+		  ("D" xref-find-definitions-other-window "-> other win")
+		  ("r" xref-find-references "References")
+		  ("s" netrom/helm-lsp-workspace-symbol-at-point "Helm search")
+		  ("S" netrom/helm-lsp-global-workspace-symbol-at-point "Helm global search")
+
+		  ;; Peek
+		  ("C-d" lsp-ui-peek-find-definitions "Definitions" :column "Peek")
+		  ("C-r" lsp-ui-peek-find-references "References")
+		  ("C-i" lsp-ui-peek-find-implementation "Implementation")
+
+		  ;; LSP
+		  ("p" lsp-describe-thing-at-point "Describe at point" :column "LSP")
+		  ("C-a" lsp-execute-code-action "Execute code action")
+		  ("R" lsp-rename "Rename")
+		  ("t" lsp-goto-type-definition "Type definition")
+		  ("i" lsp-goto-implementation "Implementation")
+		  ("f" helm-imenu "Filter funcs/classes (Helm)")
+		  ("C-c" lsp-describe-session "Describe session")
+
+		  ;; Flycheck
+		  ("l" lsp-ui-flycheck-list "List errs/warns/notes" :column "Flycheck"))
+
+		netrom--misc-lsp-hydra-heads
+		'(;; Misc
+		  ("q" nil "Cancel" :column "Misc")
+		  ("b" pop-tag-mark "Back")))
+  ;; Create general hydra.
+  (eval `(defhydra netrom/lsp-hydra (:color blue :hint nil)
+		   ,@(append
+			  netrom--general-lsp-hydra-heads
+			  netrom--misc-lsp-hydra-heads)))
+  
+  (add-hook 'lsp-mode-hook  ;; To override all other key config
+			(lambda () (local-set-key (kbd "C-c C-l") 'netrom/lsp-hydra/body)))
+  )
+
 ; optionally
 (use-package lsp-ui
 	:requires lsp-mode flycheck
 	:hook
 	(lsp-mode . lsp-ui-mode)
 	:commands lsp-ui-mode
-	:ensure t)
+	:ensure t
+	:after lsp-mode)
 
 (use-package company-lsp
 	:requires company
@@ -475,7 +531,11 @@
 	lsp-treemacs-errors-list
 	)
 ; optionally if you want to use debugger
-(use-package dap-mode)
+(use-package dap-mode
+  :config
+  (dap-mode t)
+  (dap-ui-mode t)
+  )
 ; (use-package dap-LANGUAGE) to load the dap adapter for your language
 
 ;; END_OF_LSP_MODE
@@ -490,8 +550,8 @@
  '(global-company-mode t)
  '(org-agenda-files (quote ("~/workspace/projects/finup/2019-09-23.org")))
  '(package-selected-packages
-	 (quote
-		(ag cmake-font-lock cmake-mode cmake-project cmake-ide pdf-view-restore pdf-tools treemacs-icons-dired treemacs-projectile markdown-preview-mode gh-md flymd yasnippet lsp-java ein jupyter go-mode lsp-ui helm-lsp lsp-treemacs flycheck dap-mode forge helm-descbinds helm multi-term org-bullets lsp-clangd magit treemacs treemacs-magit bazel-mode swiper zoom writeroom-mode ace-window eyebrowse projectile exec-path-from-shell helpful git-gutter rainbow-delimiters rainbow-mode highlight-thing spaceline spacemacs-theme dashboard which-key whitespace-cleanup-mode diminish use-package-chords use-package-ensure-system-package))))
+   (quote
+	(lsp-python-ms protobuf-mode ag cmake-font-lock cmake-mode cmake-project cmake-ide pdf-view-restore pdf-tools treemacs-icons-dired treemacs-projectile markdown-preview-mode gh-md flymd yasnippet jupyter go-mode helm-lsp flycheck helm-descbinds multi-term org-bullets lsp-clangd magit treemacs-magit bazel-mode zoom writeroom-mode ace-window eyebrowse exec-path-from-shell helpful git-gutter rainbow-delimiters rainbow-mode highlight-thing spaceline spacemacs-theme dashboard which-key whitespace-cleanup-mode diminish use-package-chords use-package-ensure-system-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
