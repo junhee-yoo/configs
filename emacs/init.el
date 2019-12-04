@@ -490,7 +490,7 @@
 		   ,@(append
 			  netrom--general-lsp-hydra-heads
 			  netrom--misc-lsp-hydra-heads)))
-  
+
   (add-hook 'lsp-mode-hook  ;; To override all other key config
 			(lambda () (local-set-key (kbd "C-c C-l") 'netrom/lsp-hydra/body)))
   )
@@ -513,6 +513,7 @@
 	(setq company-transformers nil
 	company-lsp-async t
 	company-lsp-cache-candidates nil)
+	(add-to-list 'company-lsp-filter-candidates '(digestif . nil))
 	:ensure t)
 
 (use-package treemacs
