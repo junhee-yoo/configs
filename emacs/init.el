@@ -305,6 +305,9 @@
 (add-hook 'org-shiftdown-final-hook 'windmove-down)
 (add-hook 'org-shiftright-final-hook 'windmove-right)
 
+;; dired-icon-mode
+(add-hook 'dired-mode-hook 'dired-icon-mode)
+
 
 (use-package org-bullets
 	:ensure t
@@ -333,6 +336,26 @@
 	(setq tab-width 4)
 	(setq python-indent-offset 4)
 	)
+
+;; (use-package elpy
+;;   :ensure t
+;;   :config
+;;   (elpy-enable)
+;;   (setq elpy-rpc-python-command "python3")
+;;   (setq elpy-rpc-backend "jedi")
+;;   (setq python-shell-interpreter-args "--simple-prompt -i")
+;;   (add-hook 'python-mode-hook (lambda ()
+;;								(setq indent-tabs-mode nil))))
+
+;; (use-package ein
+;;   :ensure t)
+
+(use-package pyenv-mode
+  :if (executable-find "pyenv")
+  :commands (pyenv-mode-versions))
+
+(use-package pyvenv
+  :defer t)
 
 ; python flycheck from venv
 ;; (defun set-flychecker-executables ()
@@ -453,7 +476,8 @@
   (java-mode . lsp-deferred)  ;;
   :commands (lsp lsp-deferred)
   :config
-  (setq lsp-clients-clangd-args '("-j=4" "-background-index" "-log=error"))
+  (setq lsp-clients-clangd-executable "/usr/local/Cellar/llvm/10.0.0_3/bin/clangd")
+  (setq lsp-clients-clangd-args '("-j=4" "-background-" "-log=error"))
   (setq lsp-prefer-flymake nil) ;; Prefer using lsp-ui(flycheck) over flymake
   (setq lsp-clients-clangd-args '("-j=4" "-background-index" "-log=error"))
   (setq netrom--general-lsp-hydra-heads
@@ -552,7 +576,7 @@
  '(org-agenda-files (quote ("~/workspace/projects/finup/2019-09-23.org")))
  '(package-selected-packages
    (quote
-	(lsp-python-ms protobuf-mode ag cmake-font-lock cmake-mode cmake-project cmake-ide pdf-view-restore pdf-tools treemacs-icons-dired treemacs-projectile markdown-preview-mode gh-md flymd yasnippet jupyter go-mode helm-lsp flycheck helm-descbinds multi-term org-bullets lsp-clangd magit treemacs-magit bazel-mode zoom writeroom-mode ace-window eyebrowse exec-path-from-shell helpful git-gutter rainbow-delimiters rainbow-mode highlight-thing spaceline spacemacs-theme dashboard which-key whitespace-cleanup-mode diminish use-package-chords use-package-ensure-system-package))))
+    (highlight-indent-guides indent-guide dap-mode company-lsp lsp-ui lsp-java python-mode elpy dired-icon lsp-python-ms protobuf-mode ag cmake-font-lock cmake-mode cmake-project cmake-ide pdf-view-restore pdf-tools treemacs-icons-dired treemacs-projectile markdown-preview-mode gh-md flymd yasnippet jupyter go-mode helm-lsp flycheck helm-descbinds multi-term org-bullets lsp-clangd magit treemacs-magit bazel-mode zoom writeroom-mode ace-window eyebrowse exec-path-from-shell helpful git-gutter rainbow-delimiters rainbow-mode highlight-thing spaceline spacemacs-theme dashboard which-key whitespace-cleanup-mode diminish use-package-chords use-package-ensure-system-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
