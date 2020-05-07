@@ -40,6 +40,8 @@
 ;;     alias emacs="emacsclient"
 ;; fi
 
+(setq abbrev-file-name "~/.emacs.d/abbrev_defs") ;; abbrev? warning이 나서 추가함 https://www.emacswiki.org/emacs/AbbrevMode
+
 (setq inhibit-startup-message t)
 (setq initial-scratch-message "")
 
@@ -60,8 +62,7 @@
 (setq tab-width 2)
 
 ;; 이맥스르 투명하게 하려면 숫자 조절
-(set-frame-parameter nil 'alpha 0.95
-					 )
+(set-frame-parameter nil 'alpha 0.95)
 
 (set-variable 'cursor-type 'bar)
 
@@ -177,7 +178,8 @@
 (use-package exec-path-from-shell
 	:ensure t
 	:init
-	(when (memq window-system '(mac ns))
+	(setq exec-path-from-shell-arguments '("-l"))
+	(when (memq window-system '(mac ns x))
 		(exec-path-from-shell-initialize)))
 
 
@@ -251,12 +253,14 @@
 
 (use-package highlight-indent-guides
 	:ensure t
-	:disabled
 	:init
 	:config
+	(setq highlight-indent-guides-method 'fill)
 	(add-hook 'vue-html-mode-hook 'highlight-indent-guides-mode)
 	(add-hook 'vue-mode-hook 'highlight-indent-guides-mode)
-	(add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
+	(add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+	(add-hook 'prog-mode-hook 'linum-mode)
+	(add-hook 'python-mode-hook 'highlight-indent-guides-mode))
 
 (use-package git-gutter
 	:ensure t
@@ -545,11 +549,9 @@
 	:defer t
 	:bind
 	("M-0" . treemacs-select-window)
-	)
-
-(use-package treemacs-magit
-	:after treemacs magit
-	:ensure t)
+	:config
+	(use-package treemacs-projectile :after treemacs projectile)
+	(use-package treemacs-magit :after treemacs magit))
 
 (use-package lsp-treemacs
 	:commands
@@ -576,7 +578,7 @@
  '(org-agenda-files (quote ("~/workspace/projects/finup/2019-09-23.org")))
  '(package-selected-packages
    (quote
-    (highlight-indent-guides indent-guide dap-mode company-lsp lsp-ui lsp-java python-mode elpy dired-icon lsp-python-ms protobuf-mode ag cmake-font-lock cmake-mode cmake-project cmake-ide pdf-view-restore pdf-tools treemacs-icons-dired treemacs-projectile markdown-preview-mode gh-md flymd yasnippet jupyter go-mode helm-lsp flycheck helm-descbinds multi-term org-bullets lsp-clangd magit treemacs-magit bazel-mode zoom writeroom-mode ace-window eyebrowse exec-path-from-shell helpful git-gutter rainbow-delimiters rainbow-mode highlight-thing spaceline spacemacs-theme dashboard which-key whitespace-cleanup-mode diminish use-package-chords use-package-ensure-system-package))))
+    (treemacs forge highlight-indent-guides indent-guide dap-mode company-lsp lsp-ui lsp-java python-mode elpy dired-icon lsp-python-ms protobuf-mode ag cmake-font-lock cmake-mode cmake-project cmake-ide pdf-view-restore pdf-tools treemacs-icons-dired treemacs-projectile markdown-preview-mode gh-md flymd yasnippet jupyter go-mode helm-lsp flycheck helm-descbinds multi-term org-bullets lsp-clangd magit treemacs-magit bazel-mode zoom writeroom-mode ace-window eyebrowse exec-path-from-shell helpful git-gutter rainbow-delimiters rainbow-mode highlight-thing spaceline spacemacs-theme dashboard which-key whitespace-cleanup-mode diminish use-package-chords use-package-ensure-system-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
