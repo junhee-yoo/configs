@@ -354,6 +354,12 @@
 ;; (use-package ein
 ;;   :ensure t)
 
+;; (use-package pipenv
+;;   :hook
+;;   (python-mode . pipenv-mode)
+;;   :init
+;;   (setq pipenv-projectile-after-switch-function #'pipenv-projectile-after-switch-extended))
+
 (use-package pyenv-mode
   :if (executable-find "pyenv")
   :commands (pyenv-mode-versions))
@@ -480,6 +486,10 @@
   (java-mode . lsp-deferred)  ;;
   :commands (lsp lsp-deferred)
   :config
+  (use-package lsp-java
+    :config
+    (use-package dap-java :after (lsp-java))
+    (add-hook 'java-mode-hook 'lsp-deferred))
   (setq lsp-clients-clangd-executable "/usr/local/Cellar/llvm/10.0.0_3/bin/clangd")
   (setq lsp-clients-clangd-args '("-j=4" "-background-" "-log=error"))
   (setq lsp-prefer-flymake nil) ;; Prefer using lsp-ui(flycheck) over flymake
@@ -559,6 +569,8 @@
 	)
 ; optionally if you want to use debugger
 (use-package dap-mode
+  :ensure t
+  :after lsp-mode
   :config
   (dap-mode t)
   (dap-ui-mode t)
@@ -578,7 +590,7 @@
  '(org-agenda-files (quote ("~/workspace/projects/finup/2019-09-23.org")))
  '(package-selected-packages
    (quote
-    (treemacs forge highlight-indent-guides indent-guide dap-mode company-lsp lsp-ui lsp-java python-mode elpy dired-icon lsp-python-ms protobuf-mode ag cmake-font-lock cmake-mode cmake-project cmake-ide pdf-view-restore pdf-tools treemacs-icons-dired treemacs-projectile markdown-preview-mode gh-md flymd yasnippet jupyter go-mode helm-lsp flycheck helm-descbinds multi-term org-bullets lsp-clangd magit treemacs-magit bazel-mode zoom writeroom-mode ace-window eyebrowse exec-path-from-shell helpful git-gutter rainbow-delimiters rainbow-mode highlight-thing spaceline spacemacs-theme dashboard which-key whitespace-cleanup-mode diminish use-package-chords use-package-ensure-system-package))))
+    (pipenv lsp-javacomp treemacs forge highlight-indent-guides indent-guide dap-mode company-lsp lsp-ui lsp-java python-mode elpy dired-icon lsp-python-ms protobuf-mode ag cmake-font-lock cmake-mode cmake-project cmake-ide pdf-view-restore pdf-tools treemacs-icons-dired treemacs-projectile markdown-preview-mode gh-md flymd yasnippet jupyter go-mode helm-lsp flycheck helm-descbinds multi-term org-bullets lsp-clangd magit treemacs-magit bazel-mode zoom writeroom-mode ace-window eyebrowse exec-path-from-shell helpful git-gutter rainbow-delimiters rainbow-mode highlight-thing spaceline spacemacs-theme dashboard which-key whitespace-cleanup-mode diminish use-package-chords use-package-ensure-system-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
