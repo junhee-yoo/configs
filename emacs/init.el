@@ -9,9 +9,6 @@
 	(scroll-bar-mode -1)
 	(tooltip-mode -1))
 
-;; server mode 시작
-(server-start)
-
 ; Apple script for eamcs daemon
 ;; tell application "Terminal"
 ;; do shell script "/Applications/Emacs.app/Contents/MacOS/Emacs --daemon"
@@ -146,7 +143,12 @@
 	(setq whitespace-cleanup-mode-only-if-initially-clean nil)
 	(add-hook 'prog-mode-hook 'whitespace-cleanup-mode)
 	(add-hook 'lsp-mode-hook 'whitespace-cleanup-mode))
-	;;(add-hook 'org-mode-hook 'whitespace-cleanup-mode))
+    ;;(add-hook 'org-mode-hook 'whitespace-cleanup-mode))
+
+;; server mode 시작
+(use-package server
+  :ensure t
+  :hook (after-init . server-mode))
 
 
 ;;; Emacs extend
@@ -487,9 +489,9 @@
   :commands (lsp lsp-deferred)
   :config
   (use-package lsp-java
-    :config
-    (use-package dap-java :after (lsp-java))
-    (add-hook 'java-mode-hook 'lsp-deferred))
+	:config
+	(use-package dap-java :after (lsp-java))
+	(add-hook 'java-mode-hook 'lsp-deferred))
   (setq lsp-clients-clangd-executable "/usr/local/Cellar/llvm/10.0.0_3/bin/clangd")
   (setq lsp-clients-clangd-args '("-j=4" "-background-" "-log=error"))
   (setq lsp-prefer-flymake nil) ;; Prefer using lsp-ui(flycheck) over flymake
@@ -575,7 +577,11 @@
   (dap-mode t)
   (dap-ui-mode t)
   )
+
 ; (use-package dap-LANGUAGE) to load the dap adapter for your language
+
+(use-package fzf
+  :ensure t)
 
 ;; END_OF_LSP_MODE
 
@@ -590,7 +596,7 @@
  '(org-agenda-files (quote ("~/workspace/projects/finup/2019-09-23.org")))
  '(package-selected-packages
    (quote
-    (pipenv lsp-javacomp treemacs forge highlight-indent-guides indent-guide dap-mode company-lsp lsp-ui lsp-java python-mode elpy dired-icon lsp-python-ms protobuf-mode ag cmake-font-lock cmake-mode cmake-project cmake-ide pdf-view-restore pdf-tools treemacs-icons-dired treemacs-projectile markdown-preview-mode gh-md flymd yasnippet jupyter go-mode helm-lsp flycheck helm-descbinds multi-term org-bullets lsp-clangd magit treemacs-magit bazel-mode zoom writeroom-mode ace-window eyebrowse exec-path-from-shell helpful git-gutter rainbow-delimiters rainbow-mode highlight-thing spaceline spacemacs-theme dashboard which-key whitespace-cleanup-mode diminish use-package-chords use-package-ensure-system-package))))
+    (typescript-mode helm-cscope xcscope fzf pipenv lsp-javacomp treemacs forge highlight-indent-guides indent-guide dap-mode company-lsp lsp-ui lsp-java python-mode elpy dired-icon lsp-python-ms protobuf-mode ag cmake-font-lock cmake-mode cmake-project cmake-ide pdf-view-restore pdf-tools treemacs-icons-dired treemacs-projectile markdown-preview-mode gh-md flymd yasnippet jupyter go-mode helm-lsp flycheck helm-descbinds multi-term org-bullets lsp-clangd magit treemacs-magit bazel-mode zoom writeroom-mode ace-window eyebrowse exec-path-from-shell helpful git-gutter rainbow-delimiters rainbow-mode highlight-thing spaceline spacemacs-theme dashboard which-key whitespace-cleanup-mode diminish use-package-chords use-package-ensure-system-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
