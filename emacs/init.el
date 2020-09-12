@@ -325,7 +325,7 @@
 
 (setq org-todo-keywords
 	  '((sequence "TODO(t)" "IN-PROGRESS(i)" "REVIEW(r)" "|" "DONE(d)")
-	(sequence "REPORTED(r)" "BUG(b)" "KNOWNCAUSE(k)" "|" "FIXED(f)" "CLOSED(c)")))
+	    (sequence "REPORTED(r)" "BUG(b)" "KNOWNCAUSE(k)" "|" "FIXED(f)" "CLOSED(c)")))
 
 ;; Multi term
 
@@ -333,6 +333,7 @@
 	:ensure t
 	:init
 	(setq multi-term-program "/bin/zsh")
+	(setq multi-term-scroll-show-maximum-output nil)
 	:bind
 	("C-c i" . multi-term))
 
@@ -340,7 +341,10 @@
 (add-hook 'term-mode-hook
 	  (lambda ()
 		(define-key term-raw-map (kbd "C-j")
-		(lookup-key (current-global-map) (kbd "C-j")))))
+		  (lookup-key (current-global-map) (kbd "C-j")))))
+
+;; shell에서 perl 관련 locale warning 제거용
+(exec-path-from-shell-copy-envs '("LANG" "LC_ALL" "LC_CTYPES"))
 
 
 ;; Language specific configs
@@ -352,7 +356,12 @@
 	(setq python-indent-offset 4)
 	)
 
-(use-package rustic)
+(use-package rustic
+  :ensure t
+  :config
+  (setq rustic-format-trigger nil)
+  (setq rustic-lsp-format t))
+
 
 
 ;; (use-package elpy
@@ -434,7 +443,9 @@
 	:config
 	(use-package helm-descbinds
 		:ensure t
-		:config (helm-descbinds-mode)))
+		:config (helm-descbinds-mode))
+	:hook
+	(rustic-mode . helm-mode))
 
 
 ;; GPG password in minibuffer
