@@ -324,7 +324,7 @@
 	(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 (setq org-todo-keywords
-      '((sequence "TODO(t)" "IN-PROGRESS(i)" "REVIEW(r)" "|" "DONE(d)")
+	  '((sequence "TODO(t)" "IN-PROGRESS(i)" "REVIEW(r)" "|" "DONE(d)")
 	(sequence "REPORTED(r)" "BUG(b)" "KNOWNCAUSE(k)" "|" "FIXED(f)" "CLOSED(c)")))
 
 ;; Multi term
@@ -353,6 +353,8 @@
 	)
 
 (use-package rustic)
+
+
 ;; (use-package elpy
 ;;   :ensure t
 ;;   :config
@@ -493,7 +495,7 @@
   (objc-mode-hook . lsp-clangd-objc-enable)
   ;((c-mode c++-mode objc-mode) . lsp-deferred)  ;; PATH should contains clangd command path.
   (python-mode . lsp-deferred)  ;; PATH should contains pyls command path.
-  (rust-mode . lsp-deferred)  ;; PATH should contains rls command path.
+  (rustic-mode . lsp-deferred)  ;; PATH should contains rls command path.
   (go-mode . lsp-deferred)  ;; PATH should contains gopls command path.
   (java-mode . lsp-deferred)  ;;
   :commands (lsp lsp-deferred)
@@ -606,7 +608,7 @@
  '(org-agenda-files (quote ("~/workspace/projects/finup/2019-09-23.org")))
  '(package-selected-packages
    (quote
-	(lsp-mode cargo rust-mode rustic typescript-mode helm-cscope xcscope fzf pipenv lsp-javacomp treemacs forge highlight-indent-guides indent-guide dap-mode company-lsp lsp-ui lsp-java python-mode elpy dired-icon lsp-python-ms protobuf-mode ag cmake-font-lock cmake-mode cmake-project cmake-ide pdf-view-restore pdf-tools treemacs-icons-dired treemacs-projectile markdown-preview-mode gh-md flymd yasnippet jupyter go-mode helm-lsp flycheck helm-descbinds multi-term org-bullets lsp-clangd magit treemacs-magit bazel-mode zoom writeroom-mode ace-window eyebrowse exec-path-from-shell helpful git-gutter rainbow-delimiters rainbow-mode highlight-thing spaceline spacemacs-theme dashboard which-key whitespace-cleanup-mode diminish use-package-chords use-package-ensure-system-package))))
+    (lsp-mode cargo rustic typescript-mode helm-cscope xcscope fzf pipenv lsp-javacomp treemacs forge highlight-indent-guides indent-guide dap-mode company-lsp lsp-ui lsp-java python-mode elpy dired-icon lsp-python-ms protobuf-mode ag cmake-font-lock cmake-mode cmake-project cmake-ide pdf-view-restore pdf-tools treemacs-icons-dired treemacs-projectile markdown-preview-mode gh-md flymd yasnippet jupyter go-mode helm-lsp flycheck helm-descbinds multi-term org-bullets magit treemacs-magit bazel-mode zoom writeroom-mode ace-window eyebrowse exec-path-from-shell helpful git-gutter rainbow-delimiters rainbow-mode highlight-thing spaceline spacemacs-theme dashboard which-key whitespace-cleanup-mode diminish use-package-chords use-package-ensure-system-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
