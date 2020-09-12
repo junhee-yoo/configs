@@ -142,8 +142,8 @@
 	:init
 	(setq whitespace-cleanup-mode-only-if-initially-clean nil)
 	(add-hook 'prog-mode-hook 'whitespace-cleanup-mode)
-	(add-hook 'lsp-mode-hook 'whitespace-cleanup-mode))
-    ;;(add-hook 'org-mode-hook 'whitespace-cleanup-mode))
+	(add-hook 'lsp-mode-hook 'whitespace-cleanup-mode)
+	(add-hook 'org-mode-hook 'whitespace-cleanup-mode))
 
 ;; server mode 시작
 (use-package server
@@ -315,10 +315,19 @@
 (add-hook 'dired-mode-hook 'dired-icon-mode)
 
 
+;; ORG mode
+
+
 (use-package org-bullets
 	:ensure t
 	:init
 	(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
+(setq org-todo-keywords
+	  '((sequence "TODO(t)" "IN-PROGRESS(i)" "REVIEW(r)" | "DONE(d)")
+	(sequence "REPORTED(r)" "BUG(b)" "KNOWNCAUSE(k)" "|" "FIXED(f)" "CLOSED(c)")))
+
+;; Multi term
 
 (use-package multi-term
 	:ensure t
